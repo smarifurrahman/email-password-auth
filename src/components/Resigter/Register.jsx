@@ -72,8 +72,8 @@ const Register = () => {
     }
 
     return (
-        <div>
-            <h4 className='text-primary'>Please Register</h4>
+        <div className='w-75 mx-auto'>
+            <h2 className='text-primary text-center mb-3'>Please Register</h2>
 
             {errorMessage === '' || <p className='text-danger mt-2'>{errorMessage}</p>}
             {successMessage === '' || <p className='text-success mt-2'>{successMessage}</p>}
