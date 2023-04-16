@@ -20,12 +20,40 @@ const Register = () => {
         const email = e.target.email.value;
         const password = e.target.password.value;
         console.log(email, password);
+
+        // validate password 
+        if (!/(?=.*[A-Z])/.test(password)) {
+            setErrorMessage('Please add at least one uppercase');
+            return;
+        }
+
+        else if (!/(?=.*[a-z])/.test(password)) {
+            setErrorMessage('Please add at least one lowecase');
+            return;
+        }
+
+        else if (!/(?=.*[0-9].*[0-9])/.test(password)) {
+            setErrorMessage('Please add at least two numbers');
+            return;
+        }
+
+        else if (!/(?=.*[!@#$&*])/.test(password)) {
+            setErrorMessage('Please add at least one special character');
+            return;
+        }
+
+        else if (password.length < 6) {
+            setErrorMessage('Please add at least 6 characters');
+            return;
+        }
+
+
         // create user in firebase
         createUserWithEmailAndPassword(auth, email, password)
             .then(result => {
                 const loggedUser = result.user;
                 console.log(loggedUser);
-                setSuccessMessage('User has created successfully.');
+                setSuccessMessage('User has been created successfully.');
             })
             .catch(error => {
                 console.error(error.message);
