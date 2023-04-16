@@ -4,7 +4,7 @@ import Header from '../Header/Header';
 
 const Main = () => {
     return (
-        <div>
+        <div className='d-flex flex-column align-items-center'>
             <Header></Header>
             <Outlet></Outlet>
         </div>
