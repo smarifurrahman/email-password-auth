@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
+import { notifyWarning } from '../../toastify/toastify';
 
 const auth = getAuth(app);
 
@@ -68,25 +69,12 @@ const Register = () => {
         sendEmailVerification(user)
             .then(result => {
                 console.log(result);
-                verifyWarning();
+                notifyWarning('Please verify your email!');
             })
             .catch(error => {
                 console.error(error.message);
                 setErrorMessage(error.message);
             })
-    }
-
-    const verifyWarning = () => {
-        toast.warn('Please verify your email!', {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-        });
     }
 
     // const handleChange = (e) => {
