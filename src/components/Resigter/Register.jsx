@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from "firebase/auth";
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -20,9 +20,11 @@ const Register = () => {
         e.preventDefault();
         setSuccessMessage('');
         setErrorMessage('');
+
         const email = e.target.email.value;
         const password = e.target.password.value;
-        console.log(email, password);
+        const name = e.target.name.value;
+        console.log(name, email, password);
 
         // validate password 
         if (!/(?=.*[A-Z])/.test(password)) {
@@ -57,6 +59,7 @@ const Register = () => {
                 const loggedUser = result.user;
                 console.log(loggedUser);
                 setSuccessMessage('User has been created successfully.');
+                updateUserData(loggedUser, name);
                 emailVerification(loggedUser);
             })
             .catch(error => {
@@ -67,12 +70,23 @@ const Register = () => {
 
     const emailVerification = (user) => {
         sendEmailVerification(user)
-            .then(result => {
-                console.log(result);
+            .then(() => {
                 notifyWarning('Please verify your email!');
             })
             .catch(error => {
                 console.error(error.message);
+                setErrorMessage(error.message);
+            })
+    }
+
+    const updateUserData = (user, name) => {
+        updateProfile(user, {
+            displayName: name
+        })
+            .then(() => {
+                console.log('user name updated');
+            })
+            .catch(error => {
                 setErrorMessage(error.message);
             })
     }
@@ -95,6 +109,8 @@ const Register = () => {
             {successMessage === '' || <p className='text-success mt-2'>{successMessage}</p>}
 
             <form onSubmit={handleSubmit}>
+                <input className="px-4 form-control" type="name" name="name" id="name" placeholder="Your Name" required />
+                <br />
                 <input className="px-4 form-control" type="email" name="email" id="email" placeholder="Your Email" required />
                 <br />
                 <input className="px-4 form-control" type="password" name="password" id="password" placeholder="Your Password" required />

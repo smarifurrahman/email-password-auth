@@ -1,9 +1,9 @@
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useState } from 'react';
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useRef, useState } from 'react';
 import app from '../../firebase/firebase.config';
 import { Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import { notifyError, notifySuccess } from '../../toastify/toastify';
+import { notifyError, notifySuccess, notifyWarning } from '../../toastify/toastify';
 
 const auth = getAuth(app);
 
@@ -11,6 +11,8 @@ const Login = () => {
 
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+
+    const emailRef = useRef();
 
     const handleLogin = event => {
         event.preventDefault();
@@ -69,7 +71,20 @@ const Login = () => {
     }
 
     const handleResetPassword = event => {
-
+        const email = emailRef.current.value;
+        console.log(email);
+        if (!email) {
+            notifyError('Please provide your email address to reset password.');
+            return;
+        }
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                notifyWarning("Please check your email inbox / spam.");
+            })
+            .catch(error => {
+                console.error(error.message);
+                setErrorMessage(error.message);
+            })
     }
 
     return (
@@ -82,7 +97,7 @@ const Login = () => {
             <form onSubmit={handleLogin}>
                 <div className="form-group mb-3">
                     <label htmlFor="email">Email</label>
-                    <input type="email" className="form-control mt-1" name="email" id="email" placeholder="Enter email" required />
+                    <input type="email" ref={emailRef} className="form-control mt-1" name="email" id="email" placeholder="Enter email" required />
                 </div>
                 <div className="form-group mb-3">
                     <label htmlFor="password">Password</label>
