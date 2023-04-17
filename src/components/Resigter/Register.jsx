@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
 import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 const auth = getAuth(app);
 
@@ -54,6 +56,7 @@ const Register = () => {
                 const loggedUser = result.user;
                 console.log(loggedUser);
                 setSuccessMessage('User has been created successfully.');
+                emailVerification(loggedUser);
             })
             .catch(error => {
                 console.error(error.message);
@@ -61,15 +64,40 @@ const Register = () => {
             });
     }
 
-    const handleChange = (e) => {
-        // console.log(e.target.value);
-        setEmail(e.target.value);
+    const emailVerification = (user) => {
+        sendEmailVerification(user)
+            .then(result => {
+                console.log(result);
+                verifyWarning();
+            })
+            .catch(error => {
+                console.error(error.message);
+                setErrorMessage(error.message);
+            })
     }
 
-    const handleBlur = (e) => {
-        // console.log(e.target.value);
-        setPassword(e.target.value);
+    const verifyWarning = () => {
+        toast.warn('Please verify your email!', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
     }
+
+    // const handleChange = (e) => {
+    //     // console.log(e.target.value);
+    //     setEmail(e.target.value);
+    // }
+
+    // const handleBlur = (e) => {
+    //     // console.log(e.target.value);
+    //     setPassword(e.target.value);
+    // }
 
     return (
         <div className='w-75 mx-auto'>
@@ -79,12 +107,14 @@ const Register = () => {
             {successMessage === '' || <p className='text-success mt-2'>{successMessage}</p>}
 
             <form onSubmit={handleSubmit}>
-                <input className="px-4 form-control" onChange={handleChange} type="email" name="email" id="email" placeholder="Your Email" required />
+                <input className="px-4 form-control" type="email" name="email" id="email" placeholder="Your Email" required />
                 <br />
-                <input className="px-4 form-control" onBlur={handleBlur} type="password" name="password" id="password" placeholder="Your Password" required />
+                <input className="px-4 form-control" type="password" name="password" id="password" placeholder="Your Password" required />
                 <br />
                 <input className='btn btn-primary' type="submit" value="Register" />
             </form>
+            <p className='mt-2'><small>Already have an account? Please <Link to="/login">Login Here.</Link></small></p>
+            <ToastContainer />
         </div>
     );
 };

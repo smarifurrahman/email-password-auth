@@ -1,4 +1,10 @@
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
+import app from '../../firebase/firebase.config';
+import { Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+
+const auth = getAuth(app);
 
 const Login = () => {
 
@@ -40,6 +46,51 @@ const Login = () => {
             setErrorMessage('Please add at least 6 characters');
             return;
         }
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(result => {
+                const loggedUser = result.user;
+                console.log(loggedUser);
+                
+                if (!loggedUser.emailVerified) {
+                    verifyError();
+                }
+                else if (loggedUser.emailVerified) {
+                    verifySuccess();
+                }
+
+                setSuccessMessage('');
+                setSuccessMessage('Login Successful');
+            })
+            .catch(error => {
+                setErrorMessage(error.message);
+            })
+    }
+
+    const verifyError = () => {
+        toast.error('Please verify your email!', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    }
+
+    const verifySuccess = () => {
+        toast.success('Login Success with verified email!', {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
     }
 
     return (
@@ -64,6 +115,8 @@ const Login = () => {
                 </div>
                 <button type="submit" className="btn btn-primary">Login</button>
             </form>
+            <p className='mt-2'><small>New to this website? Please <Link to="/register">Register Here.</Link></small></p>
+            <ToastContainer />
         </div>
     );
 };
